@@ -5,7 +5,8 @@ const {
     getMyProfile,
     updateMyProfile,
     getAllUsers,
-    getUserById
+    getUserById,
+    deleteUser
 } = require("../controllers/userProfileController");
 
 const {
@@ -24,5 +25,8 @@ router.get("/", authMiddleware, authorizeRoles("admin"), getAllUsers);
 
 // Admin: Get user by ID
 router.get("/:id", authMiddleware, authorizeRoles("admin"), getUserById);
+
+// Admin: Delete user
+router.delete("/:id", authMiddleware, authorizeRoles("admin"), deleteUser);
 
 module.exports = router;
