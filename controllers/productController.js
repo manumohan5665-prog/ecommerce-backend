@@ -50,10 +50,71 @@ const createProduct = async (req, res) => {
 
 
 // Get All Products Controller
+
 const getAllProducts = async (req, res) => {
     try {
-        // Retrieve all products from MongoDB
-        const products = await Product.find();
+        // 1. Get query parameters
+        const { search, category, minPrice, maxPrice, sort } = req.query;
+
+        // 2. Build filter object
+        const filter = {};
+
+        // Search by product name
+        if (search) {
+            filter.name = {
+                $regex: search,
+                $options: "i"
+            };
+        }
+
+        // Filter by category
+        if (category) {
+            filter.category = {
+                $regex: `^${category}$`,
+                $options: "i"
+            };
+        }
+
+        // Filter by price
+        if (minPrice !== undefined || maxPrice !== undefined) {
+            filter.price = {};
+
+            if (minPrice !== undefined) {
+                filter.price.$gte = Number(minPrice);
+            }
+
+            if (maxPrice !== undefined) {
+                filter.price.$lte = Number(maxPrice);
+            }
+
+            if (
+                !Number.isFinite(filter.price.$gte ?? 0) ||
+                !Number.isFinite(filter.price.$lte ?? 0) ||
+                (minPrice !== undefined && Number(minPrice) < 0) ||
+                (maxPrice !== undefined && Number(maxPrice) < 0) ||
+                (minPrice !== undefined && maxPrice !== undefined &&
+                    Number(minPrice) > Number(maxPrice))
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid price range"
+                });
+            }
+        }
+
+        // 3. Sorting
+        let sortOption = {};
+
+        if (sort === "price-low") {
+            sortOption.price = 1;
+        } else if (sort === "price-high") {
+            sortOption.price = -1;
+        } else if (sort === "newest") {
+            sortOption.createdAt = -1;
+        }
+
+        // 4. Find products
+        const products = await Product.find(filter).sort(sortOption);
 
         return res.status(200).json({
             success: true,
@@ -70,6 +131,7 @@ const getAllProducts = async (req, res) => {
         });
     }
 };
+
 
 
 const mongoose = require("mongoose");
