@@ -3,7 +3,8 @@ const router = express.Router();
 
 const {
     createProduct,
-    getAllProducts
+    getAllProducts,
+    getProductById
 } = require("../controllers/productController");
 const {
     authMiddleware,
@@ -23,5 +24,8 @@ router.get(
     "/",
     getAllProducts
 );
+
+// Get Single Product (Public)
+router.get("/:id", getProductById);
 
 module.exports = router;

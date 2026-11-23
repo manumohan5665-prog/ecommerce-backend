@@ -72,4 +72,47 @@ const getAllProducts = async (req, res) => {
 };
 
 
-module.exports = { createProduct, getAllProducts };
+const mongoose = require("mongoose");
+
+// Get Single Product Controller
+const getProductById = async (req, res) => {
+    try {
+        // 1. Get product ID from URL
+        const { id } = req.params;
+
+        // 2. Validate MongoDB ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid product ID"
+            });
+        }
+
+        // 3. Find product in MongoDB
+        const product = await Product.findById(id);
+
+        // 4. Check whether product exists
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        // 5. Send product response
+        return res.status(200).json({
+            success: true,
+            product
+        });
+
+    } catch (error) {
+        console.error("Get Product Error:", error.message);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+module.exports = { createProduct, getAllProducts, getProductById };
