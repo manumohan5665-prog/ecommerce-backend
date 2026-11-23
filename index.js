@@ -8,6 +8,7 @@ const {
 } = require("./middleware/authMiddleware");
 const productRoutes = require("./routes/productRoutes");
 const userProfileRoutes = require("./routes/userProfileRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const connectDB = require("./config/dbConnection");
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use("/api/auth", authenticationRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/users", userProfileRoutes);
+app.use("/api/orders", orderRoutes);
 
 // Protected test route
 app.get("/api/test-protected", authMiddleware, (req, res) => {
