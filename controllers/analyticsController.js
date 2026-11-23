@@ -52,3 +52,73 @@ const getDashboardAnalytics = async (req, res) => {
         });
     }
 };
+
+
+// Get product recommendations based on customer's previous orders
+const getProductRecommendations = async (req, res) => {
+  try {
+    // Get the customer's previous orders
+    const orders = await Order.find({
+      user: req.user.id,
+      status: { $ne: "cancelled" }
+    });
+
+    if (orders.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No order history available for recommendations",
+        recommendations: []
+      });
+    }
+
+    // Collect product IDs purchased by the customer
+    const purchasedProductIds = [
+      ...new Set(
+        orders.flatMap(order =>
+          order.items.map(item => item.product.toString())
+        )
+      )
+    ];
+
+    // Find other customers' orders containing those products
+    const relatedOrders = await Order.find({
+      user: { $ne: req.user.id },
+      status: { $ne: "cancelled" },
+      "items.product": { $in: purchasedProductIds }
+    });
+
+    // Collect related product IDs
+    const recommendedIds = [
+      ...new Set(
+        relatedOrders.flatMap(order =>
+          order.items.map(item => item.product.toString())
+        )
+      )
+    ].filter(id => !purchasedProductIds.includes(id));
+
+    // Find recommended products
+    const recommendations = await Product.find({
+      _id: { $in: recommendedIds },
+      stock: { $gt: 0 }
+    }).limit(10);
+
+    return res.status(200).json({
+      success: true,
+      count: recommendations.length,
+      recommendations
+    });
+
+  } catch (error) {
+    console.error("Product Recommendations Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};
+
+module.exports = {
+  getDashboardAnalytics,
+  getProductRecommendations
+};
