@@ -27,7 +27,7 @@ const getMyProfile = async (req, res) => {
     }
 };
 
-
+// Update logged-in user's profile
 const updateMyProfile = async (req, res) => {
     try {
         const { name, email } = req.body;
@@ -108,7 +108,7 @@ const updateMyProfile = async (req, res) => {
     }
 };
 
-
+// Admin: Get all users
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.find().sort({ createdAt: -1 });
@@ -129,8 +129,86 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+
+const mongoose = require("mongoose");
+// Get user by ID (Admin only)
+const getUserById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validate MongoDB ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid user ID"
+            });
+        }
+
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user
+        });
+
+    } catch (error) {
+        console.error("Get User Error:", error.message);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validate MongoDB ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid user ID"
+            });
+        }
+
+        const user = await User.findByIdAndDelete(id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "User deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Delete User Error:", error.message);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
 module.exports = {
     getMyProfile,
     updateMyProfile,
-    getAllUsers
+    getAllUsers,
+    getUserById,
+    deleteUser
 };

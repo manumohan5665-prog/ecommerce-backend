@@ -4,7 +4,8 @@ const router = express.Router();
 const {
     getMyProfile,
     updateMyProfile,
-    getAllUsers
+    getAllUsers,
+    getUserById
 } = require("../controllers/userProfileController");
 
 const {
@@ -20,5 +21,8 @@ router.put("/profile", authMiddleware, updateMyProfile);
 
 // Admin: Get all users
 router.get("/", authMiddleware, authorizeRoles("admin"), getAllUsers);
+
+// Admin: Get user by ID
+router.get("/:id", authMiddleware, authorizeRoles("admin"), getUserById);
 
 module.exports = router;
