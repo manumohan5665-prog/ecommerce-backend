@@ -5,7 +5,8 @@ const {
     createProduct,
     getAllProducts,
     getProductById,
-    updateProduct
+    updateProduct,
+    deleteProduct
 } = require("../controllers/productController");
 const {
     authMiddleware,
@@ -35,6 +36,14 @@ router.put(
     authMiddleware,
     authorizeRoles("admin"),
     updateProduct
+);
+
+// Delete Product (Admin only)
+router.delete(
+    "/:id",
+    authMiddleware,
+    authorizeRoles("admin"),
+    deleteProduct
 );
 
 module.exports = router;
