@@ -4,7 +4,8 @@ const router = express.Router();
 const {
   getDashboardAnalytics,
   getProductRecommendations,
-  exportRecommendationDataset
+  exportRecommendationDataset,
+  exportRecommendationDatasetCSV
 } = require("../controllers/analyticsController");
 
 const {
@@ -34,6 +35,14 @@ router.get(
   authMiddleware,
   authorizeRoles("admin"),
   exportRecommendationDataset
+);
+
+// Admin: Export recommendation dataset as CSV
+router.get(
+  "/dataset/csv",
+  authMiddleware,
+  authorizeRoles("admin"),
+  exportRecommendationDatasetCSV
 );
 
 // Export router
