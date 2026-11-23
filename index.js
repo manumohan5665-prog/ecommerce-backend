@@ -9,6 +9,7 @@ const {
 const productRoutes = require("./routes/productRoutes");
 const userProfileRoutes = require("./routes/userProfileRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const connectDB = require("./config/dbConnection");
 
@@ -23,6 +24,7 @@ app.use("/api/auth", authenticationRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/users", userProfileRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // Protected test route
 app.get("/api/test-protected", authMiddleware, (req, res) => {
