@@ -20,7 +20,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authenticationRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/profile", userProfileRoutes);
+app.use("/api/users", userProfileRoutes);
 
 // Protected test route
 app.get("/api/test-protected", authMiddleware, (req, res) => {
