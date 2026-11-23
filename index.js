@@ -7,6 +7,7 @@ const {
     authorizeRoles
 } = require("./middleware/authMiddleware");
 const productRoutes = require("./routes/productRoutes");
+const userProfileRoutes = require("./routes/userProfileRoutes");
 
 const connectDB = require("./config/dbConnection");
 
@@ -19,6 +20,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authenticationRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/profile", userProfileRoutes);
 
 // Protected test route
 app.get("/api/test-protected", authMiddleware, (req, res) => {
