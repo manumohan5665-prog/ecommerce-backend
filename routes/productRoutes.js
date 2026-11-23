@@ -4,7 +4,8 @@ const router = express.Router();
 const {
     createProduct,
     getAllProducts,
-    getProductById
+    getProductById,
+    updateProduct
 } = require("../controllers/productController");
 const {
     authMiddleware,
@@ -27,5 +28,13 @@ router.get(
 
 // Get Single Product (Public)
 router.get("/:id", getProductById);
+
+// Update Product (Admin only)
+router.put(
+    "/:id",
+    authMiddleware,
+    authorizeRoles("admin"),
+    updateProduct
+);
 
 module.exports = router;

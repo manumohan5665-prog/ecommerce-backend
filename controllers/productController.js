@@ -115,4 +115,86 @@ const getProductById = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getAllProducts, getProductById };
+
+// Update Product Controller
+const updateProduct = async (req, res) => {
+    try {
+        // 1. Get product ID
+        const { id } = req.params;
+
+        // 2. Validate MongoDB ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid product ID"
+            });
+        }
+
+        // 3. Allowed fields for updating
+        const allowedFields = [
+            "name",
+            "description",
+            "price",
+            "category",
+            "stock",
+            "image"
+        ];
+
+        const updates = {};
+
+        for (const field of allowedFields) {
+            if (req.body[field] !== undefined) {
+                updates[field] = req.body[field];
+            }
+        }
+
+        // 4. Prevent empty updates
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide at least one valid field to update"
+            });
+        }
+
+        // 5. Update product
+        const product = await Product.findByIdAndUpdate(
+            id,
+            updates,
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        // 6. Check product existence
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Product updated successfully",
+            product
+        });
+
+    } catch (error) {
+        console.error("Update Product Error:", error.message);
+
+        if (error.name === "ValidationError" || error.name === "CastError") {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+module.exports = { createProduct, getAllProducts, getProductById, updateProduct };
