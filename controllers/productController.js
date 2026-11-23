@@ -48,4 +48,28 @@ const createProduct = async (req, res) => {
     }
 };
 
-module.exports = { createProduct };
+
+// Get All Products Controller
+const getAllProducts = async (req, res) => {
+    try {
+        // Retrieve all products from MongoDB
+        const products = await Product.find();
+
+        return res.status(200).json({
+            success: true,
+            count: products.length,
+            products
+        });
+
+    } catch (error) {
+        console.error("Get Products Error:", error.message);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+
+module.exports = { createProduct, getAllProducts };
