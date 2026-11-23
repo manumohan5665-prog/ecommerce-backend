@@ -167,5 +167,6 @@ const exportRecommendationDataset = async (req, res) => {
 
 module.exports = {
   getDashboardAnalytics,
-  getProductRecommendations
+  getProductRecommendations,
+  exportRecommendationDataset
 };

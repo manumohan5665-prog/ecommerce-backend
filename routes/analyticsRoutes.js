@@ -3,7 +3,8 @@ const router = express.Router();
 
 const {
   getDashboardAnalytics,
-  getProductRecommendations
+  getProductRecommendations,
+  exportRecommendationDataset
 } = require("../controllers/analyticsController");
 
 const {
@@ -25,6 +26,14 @@ router.get(
   "/recommendations",
   authMiddleware,
   getProductRecommendations
+);
+
+// Admin: Export recommendation dataset
+router.get(
+  "/dataset",
+  authMiddleware,
+  authorizeRoles("admin"),
+  exportRecommendationDataset
 );
 
 // Export router
