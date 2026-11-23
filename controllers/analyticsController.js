@@ -165,8 +165,78 @@ const exportRecommendationDataset = async (req, res) => {
 };
 
 
+// Export recommendation dataset as CSV for machine learning purposes
+const exportRecommendationDatasetCSV = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      status: { $ne: "cancelled" }
+    })
+      .select("user items createdAt")
+      .populate("items.product", "name category price")
+      .lean();
+
+    const rows = [];
+
+    orders.forEach((order) => {
+      order.items.forEach((item) => {
+        if (!item.product) return;
+
+        rows.push({
+          customerId: order.user.toString(),
+          productId: item.product._id.toString(),
+          productName: item.product.name,
+          category: item.product.category,
+          productPrice: item.product.price,
+          quantity: item.quantity,
+          purchasePrice: item.price,
+          orderDate: order.createdAt
+        });
+      });
+    });
+
+    const headers = [
+      "customerId",
+      "productId",
+      "productName",
+      "category",
+      "productPrice",
+      "quantity",
+      "purchasePrice",
+      "orderDate"
+    ];
+
+    const escapeCSV = (value) =>
+      `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+    const csv = [
+      headers.join(","),
+      ...rows.map((row) =>
+        headers.map((header) => escapeCSV(row[header])).join(",")
+      )
+    ].join("\n");
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="recommendation-dataset.csv"'
+    );
+
+    return res.status(200).send(csv);
+
+  } catch (error) {
+    console.error("CSV Dataset Export Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "CSV export failed"
+    });
+  }
+};
+
+
 module.exports = {
   getDashboardAnalytics,
   getProductRecommendations,
-  exportRecommendationDataset
+  exportRecommendationDataset,
+  exportRecommendationDatasetCSV
 };
