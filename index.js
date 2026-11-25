@@ -10,6 +10,7 @@ const productRoutes = require("./routes/productRoutes");
 const userProfileRoutes = require("./routes/userProfileRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const errorHandler = require("./middleware/errorHandler");
 
 const connectDB = require("./config/dbConnection");
 
@@ -25,6 +26,17 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", userProfileRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/analytics", analyticsRoutes);
+
+// 404 Not Found Handler
+app.use((req, res, next) => {
+    res.status(404).json({
+        success: false,
+        message: `Route not found: ${req.method} ${req.originalUrl}`
+    });
+});
+
+// Centralized Error Handler
+app.use(errorHandler);
 
 // Protected test route
 app.get("/api/test-protected", authMiddleware, (req, res) => {
